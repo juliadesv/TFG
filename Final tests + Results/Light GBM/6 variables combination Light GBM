@@ -1,0 +1,105 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import datetime as dt
+from sklearn import metrics
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+from sklearn import tree
+import pandas as pd
+from sklearn import tree
+from sklearn.model_selection import train_test_split
+import numpy as np
+from matplotlib import pyplot as plt
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import accuracy_score
+import pandas as pd
+import itertools
+from sklearn.preprocessing import LabelEncoder
+import lightgbm as lgb
+
+def encoder(df, columns):
+    mapeo = {'Yes': 1, 'No': 0}
+    df['Holiday'] = df['Holiday'].map(mapeo)
+    df['Weekend Return'] = df['Weekend Return'].map(mapeo)
+    df = pd.get_dummies(df[columns], columns=columns)
+    df = df.astype(float)
+    return df
+
+# Leer el dataset
+df = pd.read_csv('dataset.csv')
+
+# Definir todas las variables excepto la variable objetivo
+variables = ['Holiday', 'Weekend Return', 'Time_Segment', 'VVM10', 'Season', 'PPT', 'TM', 'Week_day', 'Vacation_week']
+
+# Generar todas las combinaciones posibles de 6 variables
+combinations = list(itertools.combinations(variables, 6))
+
+# Inicializar una lista para almacenar los resultados
+results = []
+
+# Iterar sobre cada combinación
+for combo in combinations:
+    # Hacer una copia del DataFrame original para cada combinación
+    df_copy = df.copy()
+    # Codificar solo las variables presentes en la combinación
+    df_encoded = encoder(df_copy, list(combo))
+    # Dividir el conjunto de datos en características (X) y objetivo (y)
+    X = df_encoded
+    y = df['Exceeds Threshold']
+    split_index = int(len(df) * 0.85)
+    X_train, X_test = X[:split_index], X[split_index:]
+    y_train, y_test = y[:split_index], y[split_index:]
+    
+    # Definir los hiperparámetros que deseas optimizar
+    param_grid = {
+        'max_depth':[4], 
+        'num_leaves':[31],
+        'learning_rate': [0.05, 0.01],
+        'n_estimators': [200, 400]
+    }
+    
+    # Inicializar el modelo LightGBM
+    model = lgb.LGBMClassifier()
+    
+    # Inicializar GridSearchCV
+    grid_search = GridSearchCV(model, param_grid, cv=5, scoring='accuracy')
+    
+    # Entrenar el modelo con Grid Search
+    grid_search.fit(X_train, y_train)
+    
+    # Obtener la mejor combinación de hiperparámetros
+    best_params = grid_search.best_params_
+    
+    # Crear el modelo con la mejor combinación de hiperparámetros
+    best_model = lgb.LGBMClassifier(**best_params)
+    
+    # Entrenar el mejor modelo
+    best_model.fit(X_train, y_train)
+    
+    # Realizar predicciones
+    y_pred = best_model.predict(X_test)
+    
+    # Calcular la precisión
+    accuracy = accuracy_score(y_test, y_pred)
+    
+    # Agregar los resultados a la lista
+    results.append((combo, best_params, accuracy))
+
+
+# Imprimir los resultados
+for combo, best_params, accuracy in results:
+    print("Variables:", combo)
+    print("Best Parameters:", best_params)
+    print("Accuracy:", accuracy)
+    
+# Imprimir los resultados con precisión mayor que x
+for combo, best_params, accuracy in results:
+    if accuracy > 0.816:
+        print("Variables:", combo)
+        print("Best Parameters:", best_params)
+        print("Accuracy:", accuracy)
