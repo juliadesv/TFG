@@ -1,0 +1,21 @@
+digraph Tree {
+node [shape=box, style="filled, rounded", color="black", fontname="helvetica"] ;
+edge [fontname="helvetica"] ;
+0 [label=<Weekend Return &le; 0.5<br/>entropy = 0.625<br/>samples = 128<br/>value = [108, 20]<br/>class = Not Exceed>, fillcolor="#ea985e"] ;
+1 [label=<Holiday &le; 0.5<br/>entropy = 0.885<br/>samples = 66<br/>value = [46, 20]<br/>class = Not Exceed>, fillcolor="#f0b88f"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label=<Time segment &le; 4.5<br/>entropy = 0.999<br/>samples = 35<br/>value = [17, 18]<br/>class = Exceed>, fillcolor="#f4fafe"] ;
+1 -> 2 ;
+3 [label=<entropy = 0.94<br/>samples = 28<br/>value = [10, 18]<br/>class = Exceed>, fillcolor="#a7d3f3"] ;
+2 -> 3 ;
+4 [label=<entropy = 0.0<br/>samples = 7<br/>value = [7, 0]<br/>class = Not Exceed>, fillcolor="#e58139"] ;
+2 -> 4 ;
+5 [label=<Weekend Exit &le; 0.5<br/>entropy = 0.345<br/>samples = 31<br/>value = [29, 2]<br/>class = Not Exceed>, fillcolor="#e78a47"] ;
+1 -> 5 ;
+6 [label=<entropy = 0.523<br/>samples = 17<br/>value = [15, 2]<br/>class = Not Exceed>, fillcolor="#e89253"] ;
+5 -> 6 ;
+7 [label=<entropy = 0.0<br/>samples = 14<br/>value = [14, 0]<br/>class = Not Exceed>, fillcolor="#e58139"] ;
+5 -> 7 ;
+8 [label=<entropy = 0.0<br/>samples = 62<br/>value = [62, 0]<br/>class = Not Exceed>, fillcolor="#e58139"] ;
+0 -> 8 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+}
